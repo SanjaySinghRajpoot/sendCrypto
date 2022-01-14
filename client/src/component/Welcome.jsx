@@ -1,5 +1,18 @@
 import react from "react";
 
+const Input = ({ placeholder, name, type, value, handleChange }) => {
+  <input
+    placeholder={placeholder}
+    type={type}
+    step="0.001"
+    value={value}
+    onChange={(e) => handleChange(e, name)}
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
+  />;
+};
+
+const handleChange = () => {};
+
 const Welcome = () => {
   return (
     <section class="text-gray-600 body-font">
@@ -14,20 +27,46 @@ const Welcome = () => {
           </p>
           <div class="flex justify-center">
             <button class="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-              Button
+              Send
             </button>
             <button class="ml-4 inline-flex text-gray-700 bg-gray-100 border-0 py-2 px-6 focus:outline-none hover:bg-gray-200 rounded text-lg">
-              Button
+              Explore
             </button>
           </div>
         </div>
-        <div class="lg:max-w-lg lg:w-full md:w-1/2 w-5/6">
-          <img
-            class="object-cover object-center rounded"
-            alt="hero"
-            src="https://dummyimage.com/720x600"
-          />
-        </div>
+      </div>
+      <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
+        <input
+          placeholder="Address To"
+          className="p-5 sm:w-96 w-full flex flex-col my-3  justify-start items-center blue-glassmorphism"
+          name="addressTo"
+          type="text"
+          handleChange={handleChange}
+        />
+        <input
+          placeholder="Amount (ETH)"
+          name="amount"
+          className="p-5 sm:w-96 w-full flex flex-col my-3  justify-start items-center blue-glassmorphism"
+          type="number"
+          handleChange={handleChange}
+        />
+        <input
+          placeholder="Keyword (Gif)"
+          name="keyword"
+          className="p-5 sm:w-96 w-full flex flex-col  my-3 justify-start items-center blue-glassmorphism"
+          type="text"
+          handleChange={handleChange}
+        />
+        <input
+          placeholder="Enter Message"
+          name="message"
+          className="p-5 sm:w-96 w-full flex flex-col my-3 justify-start items-center blue-glassmorphism"
+          type="text"
+          handleChange={handleChange}
+        />
+        <button type="button" className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer">
+          Send
+        </button>
       </div>
     </section>
   );

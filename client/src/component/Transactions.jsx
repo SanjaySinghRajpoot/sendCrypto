@@ -2,7 +2,8 @@ import react from "react";
 
 const Transactions = () => {
   return (
-      <h1>Transactions</h1>
+
+      <h1 className="text-white">Transactions</h1>
   )
 };
 
