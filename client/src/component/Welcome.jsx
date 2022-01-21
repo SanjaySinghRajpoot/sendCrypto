@@ -1,4 +1,5 @@
-import react from "react";
+import react, { useContext } from "react";
+import { TransactionContext, TransactionProvider } from "../context/TransactionsContext";
 
 const Input = ({ placeholder, name, type, value, handleChange }) => {
   <input
@@ -14,6 +15,18 @@ const Input = ({ placeholder, name, type, value, handleChange }) => {
 const handleChange = () => {};
 
 const Welcome = () => {
+
+  const { connectWallet, currentAccount, formData, setTransaction, handleChange } = useContext(TransactionContext);
+
+  const handleSubmit = () => {
+    const {addressTo, amount, keyword, message } = formData;
+
+    e.preventDefault();
+
+    if(!addressTo || !amount || !keyword || !message) return;
+
+  }
+ 
   return (
     <section class="text-gray-600 body-font">
       <div class="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center">
@@ -64,7 +77,7 @@ const Welcome = () => {
           type="text"
           handleChange={handleChange}
         />
-        <button type="button" className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer">
+        <button type="button" className="text-white w-full mt-2 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer" onClick={connectWallet}>
           Send
         </button>
       </div>
