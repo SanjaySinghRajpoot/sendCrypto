@@ -31,9 +31,11 @@ export const TransactionProvider = ({ children }) => {
     keyword: "",
     message: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'));
 
   const handleChange = (e, name) => {
-    setFormData((prevstate) => ({...prevstate, [name]:e.target.value})); // mapping all form values
+    setFormData((prevstate) => ({ ...prevstate, [name]: e.target.value })); // mapping all form values
   };
 
   const checkIfWalletIsConnect = async () => {
@@ -78,12 +80,51 @@ export const TransactionProvider = ({ children }) => {
     try {
       if (!ethereum) return alert("Please install metamask");
 
-      //get the data from the homepage
-    } catch (error) {}
+     const { addressTo, amount, keyword, message } = formData;
+
+     const transactionContract = getEthereumContract();
+     const parsedAmout = ethers.utils.parseEther(amount);
+
+     await ethereum.request({
+       method: 'eth_sendTransactions',
+       params: [{
+         from: currrentAccount,
+         to: addressTo,
+         gas: '0x5208',
+         value: parsedAmout._hex,
+       }]
+     });
+
+     const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmout, message, keyword);
+     
+     setIsLoading(true);
+     console.log(`loading - ${transactionHash.hash}`);
+     await transactionHash.wait();
+     setIsLoading(false);
+     console.log(`Sucess - ${transactionHash.hash}`);
+
+     const transactionCount = await transactionContract.getTransactionCount();
+
+     setTransactionCount(transactionCount.toNumber());
+    
+    } catch (error) {
+      console.log(error);
+
+      throw new Error("No ethereum object");
+    }
   };
 
   return (
-    <TransactionContext.Provider value={{ connectWallet, currrentAccount, formData, setFormData, handleChange }}>
+    <TransactionContext.Provider
+      value={{
+        connectWallet,
+        currrentAccount,
+        formData,
+        setFormData,
+        handleChange,
+        sendTransaction,
+      }}
+    >
       {children}
     </TransactionContext.Provider>
   );
