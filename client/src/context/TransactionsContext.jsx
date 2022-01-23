@@ -32,7 +32,9 @@ export const TransactionProvider = ({ children }) => {
     message: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'));
+  const [transactionCount, setTransactionCount] = useState(
+    localStorage.getItem("transactionCount")
+  );
 
   const handleChange = (e, name) => {
     setFormData((prevstate) => ({ ...prevstate, [name]: e.target.value })); // mapping all form values
@@ -44,8 +46,10 @@ export const TransactionProvider = ({ children }) => {
 
       const accounts = await ethereum.request({ method: "eth_accounts" });
 
-      if (accounts.lenth) {
+      if (accounts.length) {
         setCurrrentAccount(accounts[0]);
+
+        // getAllTransactions();
       } else {
         console.log("No accounts found");
       }
@@ -78,35 +82,43 @@ export const TransactionProvider = ({ children }) => {
 
   const sendTransaction = async () => {
     try {
-      if (!ethereum) return alert("Please install metamask");
+      if (ethereum) {
+        const { addressTo, amount, keyword, message } = formData;
+        const transactionsContract = createEthereumContract();
+        const parsedAmount = ethers.utils.parseEther(amount);
 
-     const { addressTo, amount, keyword, message } = formData;
+        await ethereum.request({
+          method: "eth_sendTransaction",
+          params: [
+            {
+              from: currentAccount,
+              to: addressTo,
+              gas: "0x5208",
+              value: parsedAmount._hex,
+            },
+          ],
+        });
 
-     const transactionContract = getEthereumContract();
-     const parsedAmout = ethers.utils.parseEther(amount);
+        const transactionHash = await transactionsContract.addToBlockchain(
+          addressTo,
+          parsedAmount,
+          message,
+          keyword
+        );
 
-     await ethereum.request({
-       method: 'eth_sendTransactions',
-       params: [{
-         from: currrentAccount,
-         to: addressTo,
-         gas: '0x5208',
-         value: parsedAmout._hex,
-       }]
-     });
+        setIsLoading(true);
+        console.log(`Loading - ${transactionHash.hash}`);
+        await transactionHash.wait();
+        console.log(`Success - ${transactionHash.hash}`);
+        setIsLoading(false);
 
-     const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmout, message, keyword);
-     
-     setIsLoading(true);
-     console.log(`loading - ${transactionHash.hash}`);
-     await transactionHash.wait();
-     setIsLoading(false);
-     console.log(`Sucess - ${transactionHash.hash}`);
+        const transactionsCount =
+          await transactionsContract.getTransactionCount();
 
-     const transactionCount = await transactionContract.getTransactionCount();
-
-     setTransactionCount(transactionCount.toNumber());
-    
+        setTransactionCount(transactionsCount.toNumber());
+      } else {
+        console.log("No ethereum object");
+      }
     } catch (error) {
       console.log(error);
 
